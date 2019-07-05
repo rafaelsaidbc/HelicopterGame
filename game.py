@@ -74,15 +74,15 @@ bullets = []
 
 bombs = []
 
-shoot = pygame.mixer.sound('sounds/shoot.wav')
-pop = pygame.mixer.sound('sounds/pop.wav')
-bomb = pygame.mixer.sound('sounds/bomb.wav')
-explosion = pygame.mixer.sound('sounds/explosion.wav')
-explosion2 = pygame.mixer.sound('sounds/explosion2.wav')
-select = pygame.mixer.sound('sounds/select.wav')
-select2 = pygame.mixer.sound('sounds/select2.wav')
-alert = pygame.mixer.sound('sounds/alert.wav')
-whoosh = pygame.mixer.sound('sounds/whoosh.wav')
+shoot = pygame.mixer.Sound('sounds/shoot.wav')
+pop = pygame.mixer.Sound('sounds/pop.wav')
+bomb = pygame.mixer.Sound('sounds/bomb.wav')
+explosion = pygame.mixer.Sound('sounds/explosion.wav')
+explosion2 = pygame.mixer.Sound('sounds/explosion2.wav')
+select = pygame.mixer.Sound('sounds/select.wav')
+select2 = pygame.mixer.Sound('sounds/select2.wav')
+alert = pygame.mixer.Sound('sounds/alert.wav')
+whoosh = pygame.mixer.Sound('sounds/whoosh.wav')
 
 
 def main_menu():
@@ -159,4 +159,248 @@ def main_menu():
                 clock.tick(FPS)
 
 
+def pause():
+    global hightscore_file
+    global hightscore_int
 
+    paused = True
+
+    player.moving_up = False
+    player.moving_down = False
+    player.moving_left = False
+    player.moving_right = False
+
+    paused_text = message_to_screen('Jogo pausado!', font, 100, black)
+    paused_text_rect = paused_text.get_rect()
+    game_display.blit(paused_text, (display_width / 2 - (paused_text_rect[2] / 2), 40))
+
+    pygame.display.update()
+    clock.tick(15)
+
+    while paused:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                if score > highscore_int:
+                    highscore_file = open('highscore.dat', 'w')
+                    highscore_file.write(str(score))
+                    pygame.quit()
+                    quit()
+
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_p:
+                        pygame.mixer.Sound.play(select)
+                        paused = False
+
+
+def game_loop():
+    global spaceship_x
+    global spaceship_y
+    global spaceship_alive
+    global spaceship_hit_player
+    global warning
+    global warning_counter
+    global warning_once
+
+    global bullets
+    global moving
+
+    global highscore_file
+    global highscore_int
+    global score
+
+    global cloud_x
+    global cloud_y
+
+    global enemy_heli_alive
+    global boat_alive
+
+    game_exit = False
+    game_over = False
+
+    game_over_selected = "Jogar novamente"
+
+    while not game_exit:
+        while game_over:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    if score > highscore_int:
+                        highscore_file = open('highscore.dat', 'w')
+                        highscore_file.write(str(score))
+                        highscore_file.close()
+                        pygame.quit()
+                        quit()
+
+                    if event.type == pygame.KEYDOWN:
+                        if event.key == pygame.K_w or event.key == pygame.K_UP:
+                            pygame.mixer.Sound.play(select)
+                            game_over_selected = 'Jogar novamente'
+
+                    elif event.key == pygame.K_s or event.key == pygame.K_DOWN:
+                        pygame.mixer.Sound.play(select)
+                        game_over_selected = 'quit'
+
+                        if event.key == pygame.K_SPACE or event.key == pygame.K_RETURN:
+                            pygame.mixer.Sound.play(select2)
+                            if game_over_selected == 'Jogar novamente':
+                                if score > highscore_int:
+                                    highscore_file = open('highscore.dat', 'w')
+                                    highscore_file.write(str(score))
+                                    highscore_file.close()
+                                    game_over = False
+
+                                    score = 0
+
+                                    balloon_x = 800
+
+                                    enemy_heli.x = -100
+                                    enemy_heli_alive = False
+                                    enemy_heli.bullets = []
+
+                                    boat.x = -110
+                                    boat_alive = False
+                                    boat.bullets = []
+
+                                    spaceship_x = 800
+                                    spaceship_alive = False
+                                    warning = False
+                                    warning_counter = 0
+                                    warning_counter = 0
+
+                                    player.wreck_start = False
+                                    player.y = display_height / 2 - 40
+                                    player.x = 100
+                                    player.wrecked = False
+                                    player.health = 3
+                                    bullets = []
+
+                                    game_loop()
+                                if game_over_selected == 'quit':
+                                    pygame.quit()
+                                    quit()
+            game_over_text = message_to_screen('Game over', font, 100, black)
+            your_score = message_to_screen('Sua pontuação foi: ' + str(score), font, 50, black)
+            if game_over_selected == 'Jogar novamente':
+                play_again = message_to_screen('Jogar novamente', font, 75, white)
+            else:
+                play_again = message_to_screen('Jogar novamente', font, 75, black)
+                if game_over_selected == 'quit':
+                    game_quit = message_to_screen('Quit', font, 75, white)
+                else:
+                    game_quit = message_to_screen('Quit', font, 75, black)
+
+            game_over_rect = game_over_text.get_rect()
+            your_score_rect = your_score.get_rect()
+            play_again_rect = play_again.get_rect()
+            game_quit_rect = game_quit.get_rect()
+
+            game_display.blit(game_over_text, (display_width / 2 - game_over_rect[2] / 2, 40))
+            game_display.blit(game_over_text, (display_width / 2 - your_score_rect[2] / 2 + 5, 100))
+            game_display.blit(game_over_text, (display_width / 2 - play_again_rect[2] / 2, 200))
+            game_display.blit(game_over_text, (display_width / 2 - game_quit_rect[2] / 2, 260))
+
+            pygame.display.update()
+            pygame.display.set_caption('Velocidade do Helicopter' + str(int(clock.get_fps())) + ' por segundo')
+            clock.tick(10)
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                if score > highscore_int:
+                    highscore_file = open('highscore.dat', 'w')
+                    highscore_file.write(str(score))
+                    highscore_file.close()
+                    pygame.quit()
+                    quit()
+
+                if moving:
+                    if event.type == pygame.KEYDOWN:
+                        if event.key == pygame.K_w:
+                            player.moving_up = True
+
+                        if event.key == pygame.K_a:
+                            player.moving_left = True
+
+                        if event.key == pygame.K_d:
+                            player.moving_right = True
+
+                        if event.key == pygame.K_s:
+                            player.moving_down = True
+
+                        if event.key == pygame.K_SPACE:
+                            if not player.wreck_start:
+                                pygame.mixer.Sound.play(shoot)
+                                bullets.append(([player.x, player.y]))
+
+                        if event.key == pygame.K_LSHIFT:
+                            if not player.wreck_start:
+                                pygame.mixer.Sound.play(bomb)
+                                bombs.append(([player.x, player.y]))
+
+                        if event.key == pygame.K_p:
+                            pygame.mixer.Sound.play(select)
+                            pause()
+
+                    if event.type == pygame.KEYUP:
+                        if event.key == pygame.K_w:
+                            player.moving_up = False
+
+                        if event.key == pygame.K_a:
+                            player.moving_left = False
+
+                        if event.key == pygame.K_s:
+                            player.moving_down = False
+
+                        if event.key == pygame.K_d:
+                            player.moving_right = False
+
+        if player.health < 1:
+            pygame.mixer.Sound.play(explosion)
+            player.wreck()
+
+        if player.wrecked:
+            game_over = True
+
+        game_display.blit(sprites.background, (0, 0))
+        game_display.blit(sprites.cloud, (cloud_x, cloud_y))
+        if cloud_x <= 800 - 1100:
+            cloud_x = 800
+            cloud_y = random.randint(0, 400)
+        else:
+            if not player.wreck_start:
+                cloud_x -= 5
+
+        game_display.blit(player.current, (player.x, player.y))
+        game_display.blit(enemy_heli.current, (enemy_heli.x, enemy_heli.y))
+        game_display.blit(sprites.spaceship, (spaceship_x, spaceship_y))
+        game_display.blit(sprites.boat, (boat.x, boat.y))
+
+        player.player_init()
+        enemy_heli.init()
+        boat.init()
+
+        if not player.wreck_start and not player.wrecked:
+            for draw_bullet in bullets:
+                pygame.draw.rect(game_display, black, (draw_bullet[0] + 90, draw_bullet[1] + 40, 10, 10))
+            for move_bullet in range(len(bullets)):
+                bullets[move_bullet][0] += 40
+            for del_bullet in bullets:
+                if del_bullet[0] >= 800:
+                    bullets.remove(del_bullet)
+
+        if not player.wreck_start and not player.wrecked:
+            for draw_bomb in bombs:
+                pygame.draw.rect(game_display, black, (draw_bomb[0] + 55, draw_bomb[1] + 70, 20, 20))
+            for move_bomb in range(len(bombs)):
+                bombs[move_bomb][1] += 20
+            for del_bomb in bombs:
+                if del_bomb[1] >= 600:
+                    bombs.remove(del_bomb)
+
+        if not player.wreck_start and not player.wrecked and not game_over:
+            for draw_bullet in enemy_heli.bullets:
+                pygame.draw.rect(game_display, gray, (draw_bullet[0], draw_bullet[1] + 40, 40, 10))
+                pygame.draw.rect(game_display, red, (draw_bullet[0] + 30, draw_bullet[1] + 40, 10, 10))
+            for move_bullet in range(len(enemy_heli.bullets)):
+                enemy_heli.bullets[move_bullet][0] -= 15
+            for del_bullet in enemy_heli.bullets:
+                if del_bullet[0] <= -40:
+                    enemy_heli.bullets.remove(del_bullet)
