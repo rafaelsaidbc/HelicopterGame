@@ -404,3 +404,38 @@ def game_loop():
             for del_bullet in enemy_heli.bullets:
                 if del_bullet[0] <= -40:
                     enemy_heli.bullets.remove(del_bullet)
+
+        if not player.wreck_start and not player.wrecked and not game_over:
+            for draw_bullet in boat.bullets:
+                pygame.draw.rect(game_display, gray, (draw_bullet[0] + 40, draw_bullet[1] + 30, 20, 20))
+            for move_bullet in range(len(boat.bullets)):
+                boat.bullets[move_bullet][0] -= 10
+                boat.bullets[move_bullet][1] -= 10
+            for del_bullet in boat.bullets:
+                if del_bullet[1] <= -40:
+                    boat.bullets.remove(del_bullet)
+
+        for pop_balloon in bullets:
+            if balloon_x < pop_balloon[0] + 90 < balloon_x + 70 and balloon_y < pop_balloon[1] + 40 < balloon_y + 100:
+                pygame.mixer.Sound.play(pop)
+                bullets.remove(pop_balloon)
+                balloon_x = 800 - 870
+                score += 50
+            elif balloon_x < pop_balloon[0] + 100 < balloon_x + 70 and balloon_y < pop_balloon[
+                1] + 50 < balloon_y + 100:
+                pygame.mixer.Sound.play(pop)
+                bullets.remove(pop_balloon)
+                balloon_x = 800 - 870
+                score += 50
+
+        for pop_balloon in bombs:
+            if balloon_x < pop_balloon[0] + 55 < balloon_x + 70 and balloon_y < pop_balloon[1] + 70 < balloon_y + 100:
+                pygame.mixer.Sound.play(pop)
+                bombs.remove(pop_balloon)
+                balloon_x = 800 - 870
+                score += 50
+            elif balloon_x < pop_balloon[0] + 75 < balloon_x + 70 and balloon_y < pop_balloon[1] + 90 < balloon_y + 100:
+                pygame.mixer.Sound.play(pop)
+                bombs.remove(pop_balloon)
+                balloon_x = 800 - 870
+                score += 50
