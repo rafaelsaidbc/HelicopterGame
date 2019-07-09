@@ -47,3 +47,29 @@ class EnemyHeli(object):
             else:
                 self.moving_up = True
                 self.moving_down = False
+
+    def animation(self):
+        self.counter += 1
+        if self.counter == 2:
+            if self.next_0:
+                self.current = sprites.enemy_helicopter_list[0]
+                self.next_0 = False
+                self.next_1 = True
+            elif self.next_1:
+                self.current = sprites.enemy_helicopter_list[1]
+                self.next_1 = False
+                self.next_0 = True
+
+            self.counter = 0
+
+    def shoot(self):
+        self.shoot_counter += 1
+        if self.shoot_counter >= 30:
+            if not self.x > 600 and not self.x < 400:
+                self.bullets.append([self.x, self.y])
+                self.shoot_counter = 0
+
+    def init(self):
+        self.movement()
+        self.animation()
+        self.shoot()
