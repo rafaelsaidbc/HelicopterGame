@@ -40,6 +40,7 @@ class Helicopter(object):
             self.wreck_start = False
             self.wrecked = True
 
+
     def blink_red(self):
         self.animation_list = sprites.damage_helicopter_list
         self.damaged_counter += 1
@@ -47,3 +48,30 @@ class Helicopter(object):
             self.animation_list = sprites.helicopter_list
             self.damaged = False
             self.damaged_counter = 0
+
+    def movement(self):
+        speed = 10
+        if not self.wreck_start:
+            if (self.moving_up and self.moving_left) or (self.moving_down and self.moving_left):
+                speed *= 0.707
+            if (self.moving_up and self.moving_right) or (self.moving_down and self.moving_right):
+                speed *= 0.707
+
+            if self.moving_up:
+                self.y -= speed
+            if self.moving_left:
+                self.x -= speed
+            if self.moving_down:
+                self.y += speed
+            if self.moving_right:
+                self.x += speed * 2
+
+            if self.x > 200:
+                self.x -= speed * 2
+            elif self.x > 100:
+                self.x -= speed / 2
+
+            if self.x < 0:
+                self.x += speed
+            elif self.x < 100:
+                self.x += speed / 2
