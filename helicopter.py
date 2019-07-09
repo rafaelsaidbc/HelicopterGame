@@ -75,3 +75,27 @@ class Helicopter(object):
                 self.x += speed
             elif self.x < 100:
                 self.x += speed / 2
+
+            if self.y < 0:
+                self.y = 0
+            if self.y > 430:
+                self.health = 0
+
+    def animation(self):
+        self.counter += 1
+        if self.counter == 2:
+            if self.next_0:
+                self.current = self.animation_list[0]
+                self.next_0 = False
+                self.next_1 = True
+            elif self.next_1:
+                self.current = self.animation_list[1]
+                self.next_1 = False
+                self.next_0 = True
+                self.counter = 0
+
+    def player_init(self):
+        self.animation()
+        self.movement()
+        if self.damaged:
+            self.blink_red()
