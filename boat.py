@@ -5,7 +5,7 @@ import pygame
 
 class Boat(object):
     shoot_counter = 0
-    bulltes = []
+    bullets = []
 
     x = 0
     y = 0
@@ -23,7 +23,7 @@ class Boat(object):
     def shoot(self):
         self.shoot_counter += 1
         if self.shoot_counter >= 50:
-            self.bulltes.append([self.x, self.y])
+            self.bullets.append([self.x, self.y])
             self.shoot_counter = 0
 
     def init(self):
